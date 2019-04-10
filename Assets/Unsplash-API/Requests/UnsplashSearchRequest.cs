@@ -11,7 +11,7 @@ namespace UnsplashExplorerForUnity {
         public Task<UnsplashMultiplePhotosRequestResult> GetSearchResultsAsync(string query, string collections, int page, int per_page, UnsplashPhotoOrientation orientation){
             
             var orientation_param = orientation == UnsplashPhotoOrientation.Any ? "" : $"&orientation={orientation.ToString().ToLower()}";
-            var collections_param = collections == null ? "" : $"&collections={collections}";
+            var collections_param = string.IsNullOrWhiteSpace(collections) ? "" : $"&collections={collections}";
 
             var url = $"https://api.unsplash.com/search/photos?page={page}&per_page={per_page}&query={query}{collections_param}{orientation_param}";
             

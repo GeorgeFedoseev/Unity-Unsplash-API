@@ -15,10 +15,10 @@ namespace UnsplashExplorerForUnity {
         {
             
             var orientation_param = orientation == UnsplashPhotoOrientation.Any ? "" : $"&orientation={orientation.ToString().ToLower()}";
-            var query_param = query == null ? "" : $"&query={query}";
-            var user_param = user == null ? "" : $"&user={user}";
+            var query_param = string.IsNullOrWhiteSpace(query) ? "" : $"&query={query}";
+            var user_param = string.IsNullOrWhiteSpace(user) ? "" : $"&user={user}";
             var featured_param = $"&featured={(only_featured?1:0)}";
-            var collections_param = collections == null ? "" : $"&collections={collections}";
+            var collections_param = string.IsNullOrWhiteSpace(collections) ? "" : $"&collections={collections}";
 
             var url = $"https://api.unsplash.com/photos/random?{featured_param}{query_param}{user_param}{collections_param}{orientation_param}";
             
