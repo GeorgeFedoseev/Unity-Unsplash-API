@@ -1,5 +1,5 @@
 
-namespace UnsplashExplorerForUnity.Model {
+namespace UnsplashExplorerForUnity {
 
     public enum UnsplashPhotoSize {
         Raw,

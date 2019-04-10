@@ -27,19 +27,21 @@ public class ExampleUnsplashExplorerScript : MonoBehaviour
         //     }
         // }, TaskScheduler.FromCurrentSynchronizationContext());
 
-        UnsplashExplorer.Main.SearchPhotos("cucumber").ContinueWith(searchTask => {            
+        UnsplashExplorer.Main.SearchPhotos("lion", 1, 1).ContinueWith(searchTask => {            
             if(searchTask.IsCanceled){
                 Debug.Log("search cancelled");
             }else if(searchTask.IsFaulted){
                 Debug.LogError($"search failed: {searchTask.Exception}");
             }else{
                 Debug.Log($"Received photos: {searchTask.Result.Count}");
-                var first = searchTask.Result.FirstOrDefault();
+                var firstPhoto = searchTask.Result.FirstOrDefault();
 
-                if(first != null){
-                    new UnsplashDownloader(first, new Progress<float>((progress) => {
+                if(firstPhoto != null){
+                    new UnsplashDownloader().DownloadPhotoAsync(firstPhoto, new Progress<float>((progress) => {
                         print($"Downloading picture: {progress}");
-                    })).DownloadImageAsync(UnsplashPhotoSize.Raw).ContinueWith(t => {
+                    }), UnsplashPhotoSize.Thumb)
+
+                    .ContinueWith(t => {
                         if(t.IsCanceled){
                             print("Download canceled");
                         }else if(t.IsFaulted){

@@ -18,13 +18,20 @@ namespace UnsplashExplorerForUnity {
 
         private Coroutine _downloadCoroutine;
 
-        public UnsplashDownloader(UnsplashPhoto photo, IProgress<float> progressReporter){
-            _photo = photo;
-            _coroutineRunner = UnsplashExplorer.Main;
-            _progressReporter = progressReporter;
+        public UnsplashDownloader(){            
+            _coroutineRunner = UnsplashExplorer.Main;            
         }
 
-        public Task<Texture2D> DownloadImageAsync(UnsplashPhotoSize size){
+        public Task<Texture2D> DownloadPhotoAsync(UnsplashPhoto photo, IProgress<float> progressReporter, 
+                                                    UnsplashPhotoSize size = UnsplashPhotoSize.Regular){
+
+            if(_downloadCoroutine != null){
+                throw new InvalidOperationException("Download is already in progress");
+            }
+            
+            _progressReporter = progressReporter;
+            _photo = photo;
+
             _taskCompletionSource = new TaskCompletionSource<Texture2D>();
 
             var url = _photo.urls.GetUrlForSize(size);
@@ -52,6 +59,10 @@ namespace UnsplashExplorerForUnity {
                 yield return null;
             }
 
+            if(_progressReporter != null){
+                    _progressReporter.Report(1f);
+                }
+
             if(www.isNetworkError || www.isHttpError) {
                 _taskCompletionSource.SetException(new UnsplashRequestException(www.error));
             }
@@ -59,6 +70,8 @@ namespace UnsplashExplorerForUnity {
                 var texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
                 _taskCompletionSource.SetResult(texture);
             }
+
+            _downloadCoroutine = null;
         }
     }
 
