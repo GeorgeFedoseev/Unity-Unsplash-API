@@ -15,8 +15,8 @@ namespace UnsplashExplorerForUnity.Model {
         public string instagram_username;
         public string twitter_username;
         public string portfolio_url;
-        public Dictionary<string, string> profile_image;
-        public Dictionary<string, string> links;
+        public UnsplashUserProfileImageUrls profile_image;
+        public UnsplashUserLinks links;
 
     }
 

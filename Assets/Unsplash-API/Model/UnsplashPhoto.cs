@@ -23,7 +23,7 @@ namespace UnsplashExplorerForUnity.Model {
 
         public UnsplashUser user;
 
-        public Dictionary<string, string> urls;
-        public Dictionary<string, string> links;
+        public UnsplashPhotoUrls urls;
+        public UnsplashPhotoLinks links;
     }
 }

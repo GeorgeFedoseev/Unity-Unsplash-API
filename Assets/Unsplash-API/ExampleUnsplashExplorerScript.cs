@@ -1,11 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 using UnsplashExplorerForUnity;
+using UnsplashExplorerForUnity.Model;
 
 public class ExampleUnsplashExplorerScript : MonoBehaviour
 {
+    [SerializeField]
+    private RawImage _rawImage;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,21 +27,40 @@ public class ExampleUnsplashExplorerScript : MonoBehaviour
         //     }
         // }, TaskScheduler.FromCurrentSynchronizationContext());
 
-        UnsplashExplorer.Main.SearchPhotos("cucumber").ContinueWith(t => {            
-            if(t.IsCanceled){
+        UnsplashExplorer.Main.SearchPhotos("cucumber").ContinueWith(searchTask => {            
+            if(searchTask.IsCanceled){
                 Debug.Log("search cancelled");
-            }else if(t.IsFaulted){
-                Debug.LogError($"search failed: {t.Exception}");
+            }else if(searchTask.IsFaulted){
+                Debug.LogError($"search failed: {searchTask.Exception}");
             }else{
-                Debug.Log($"Received photos: {t.Result.Count}");
-                Debug.Log($"Photo url t.Result[0].urls == null: {t.Result[0].urls == null}");
+                Debug.Log($"Received photos: {searchTask.Result.Count}");
+                var first = searchTask.Result.FirstOrDefault();
+
+                if(first != null){
+                    new UnsplashDownloader(first, new Progress<float>((progress) => {
+                        print($"Downloading picture: {progress}");
+                    })).DownloadImageAsync(UnsplashPhotoSize.Raw).ContinueWith(t => {
+                        if(t.IsCanceled){
+                            print("Download canceled");
+                        }else if(t.IsFaulted){
+                            Debug.LogError($"Failed to download image: {t.Exception}");
+                        }else{
+                            SetTexture(t.Result);
+                        }
+                    }, TaskScheduler.FromCurrentSynchronizationContext()).LogExceptions();
+                }
             }
-        }, TaskScheduler.FromCurrentSynchronizationContext());
+        }, TaskScheduler.FromCurrentSynchronizationContext()).LogExceptions();
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    // METHODS
+    private void SetTexture(Texture2D texture){
+        _rawImage.texture = texture;
     }
 }

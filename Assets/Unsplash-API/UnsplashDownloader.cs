@@ -27,7 +27,7 @@ namespace UnsplashExplorerForUnity {
         public Task<Texture2D> DownloadImageAsync(UnsplashPhotoSize size){
             _taskCompletionSource = new TaskCompletionSource<Texture2D>();
 
-            var url = _photo.urls[size.ToString().ToLower()];
+            var url = _photo.urls.GetUrlForSize(size);
             _downloadCoroutine = _coroutineRunner.StartCoroutine(DownloadCoroutine(url));
 
             return _taskCompletionSource.Task;
