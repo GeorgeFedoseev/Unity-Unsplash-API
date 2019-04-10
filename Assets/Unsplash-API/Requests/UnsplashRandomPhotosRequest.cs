@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnsplashExplorerForUnity.Model;
@@ -9,7 +10,7 @@ namespace UnsplashExplorerForUnity {
 
 
         // https://unsplash.com/documentation#get-a-random-photo
-        public Task<UnsplashMultiplePhotosRequestResult> GetRandomPhotosAsync(int count, bool only_featured, string query,
+        public Task<UnsplashPhoto> GetRandomPhotoAsync(bool only_featured, string query,
                                               string user, string collections, UnsplashPhotoOrientation orientation)
         {
             
@@ -19,9 +20,9 @@ namespace UnsplashExplorerForUnity {
             var featured_param = $"&featured={(only_featured?1:0)}";
             var collections_param = collections == null ? "" : $"&collections={collections}";
 
-            var url = $"https://api.unsplash.com/photos/random?count={count}{featured_param}{query_param}{user_param}{collections_param}{orientation_param}";
+            var url = $"https://api.unsplash.com/photos/random?{featured_param}{query_param}{user_param}{collections_param}{orientation_param}";
             
-            var completionSource = new TaskCompletionSource<UnsplashMultiplePhotosRequestResult>();
+            var completionSource = new TaskCompletionSource<UnsplashPhoto>();
 
             GetResponseStringAsync(url).ContinueWith(t => {
                 if(t.IsCanceled){
@@ -36,16 +37,12 @@ namespace UnsplashExplorerForUnity {
                     
                     // parse json
                     try {
-                        var result = JsonUtility.FromJson<UnsplashMultiplePhotosRequestResult>(jsonResultString);
+                        var result = JsonUtility.FromJson<UnsplashPhoto>(jsonResultString);
 
-                        Debug.Log("parsed json string");
-
-                        if(result.HasErrors){
-                            var apiException = new UnsplashAPIException($"{result.errors.Count} error(-s): {string.Join("; ", result.errors)}");
-                            completionSource.SetException(apiException);
-                        }else{
-                            completionSource.SetResult(result);
-                        }                        
+                        Debug.Log("parsed json string");                       
+                        
+                        completionSource.SetResult(result);
+                                                
                     }catch(Exception ex){
                         completionSource.SetException(ex);
                     }
