@@ -5,15 +5,21 @@ using UnsplashExplorerForUnity.Model;
 
 namespace UnsplashExplorerForUnity {
 
-    public class UnsplashSearchRequest : UnsplashRequest {
+    public class UnsplashRandomPhotosRequest : UnsplashRequest {
 
-        // https://unsplash.com/documentation#search-photos
-        public Task<UnsplashMultiplePhotosRequestResult> GetSearchResultsAsync(string query, string collections, int page, int per_page, UnsplashPhotoOrientation orientation){
+
+        // https://unsplash.com/documentation#get-a-random-photo
+        public Task<UnsplashMultiplePhotosRequestResult> GetRandomPhotosAsync(int count, bool only_featured, string query,
+                                              string user, string collections, UnsplashPhotoOrientation orientation)
+        {
             
             var orientation_param = orientation == UnsplashPhotoOrientation.Any ? "" : $"&orientation={orientation.ToString().ToLower()}";
+            var query_param = query == null ? "" : $"&query={query}";
+            var user_param = user == null ? "" : $"&user={user}";
+            var featured_param = $"&featured={(only_featured?1:0)}";
             var collections_param = collections == null ? "" : $"&collections={collections}";
 
-            var url = $"https://api.unsplash.com/search/photos?page={page}&per_page={per_page}&query={query}{collections_param}{orientation_param}";
+            var url = $"https://api.unsplash.com/photos/random?count={count}{featured_param}{query_param}{user_param}{collections_param}{orientation_param}";
             
             var completionSource = new TaskCompletionSource<UnsplashMultiplePhotosRequestResult>();
 
