@@ -3957,6 +3957,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _photoSize: 2
   button: {fileID: 0}
+  _attributionIsClickable: 1
   _rawImage: {fileID: 3270807514603820905}
   _aspectRatioFitter: {fileID: 8663202457068613933}
   _attributionText: {fileID: 4248578094618660779}

@@ -14,6 +14,9 @@ public class PhotoCellScript : MonoBehaviour
     public Button button;
 
     [SerializeField]
+    private bool _attributionIsClickable = false;
+
+    [SerializeField]
     private RawImage _rawImage;
 
     [SerializeField]
@@ -42,9 +45,13 @@ public class PhotoCellScript : MonoBehaviour
         _photo = photo;
 
         _attributionText.text = $"Photo by {photo.user.name}";
-        _attributionText.GetComponent<Button>().onClick.AddListener(() => {
-            Application.OpenURL(photo.user.links.html);
-        });
+        _attributionText.raycastTarget = _attributionIsClickable;
+        if(_attributionIsClickable){
+            _attributionText.GetComponent<Button>().onClick.AddListener(() => {
+                Application.OpenURL(photo.user.links.html);
+            });
+        }
+        
 
         ShowErrorLoading(false);
         ShowRawImage(false);
