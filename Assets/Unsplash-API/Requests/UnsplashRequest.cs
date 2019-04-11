@@ -47,8 +47,8 @@ namespace UnsplashExplorerForUnity {
 
             var responseHeaders = www.GetResponseHeaders();
 
-            // var responseHeadersStr = string.Join("; ", responseHeaders.Select(kv => $"{kv.Key} = {kv.Value}"));
-            // Debug.Log($"responseHeadersStr: {responseHeadersStr}");
+            var responseHeadersStr = string.Join("; ", responseHeaders.Select(kv => $"{kv.Key} = {kv.Value}"));
+            Debug.Log($"responseHeadersStr: {responseHeadersStr}");
 
             
             int remainingLimit = -1;
@@ -85,7 +85,7 @@ namespace UnsplashExplorerForUnity {
 
         private int GetTotalLimitForCurrentHour(Dictionary<string, string> responseHeaders){
             int result = -1;
-            if(!responseHeaders.ContainsKey("Age") && responseHeaders.ContainsKey("X-Ratelimit-Limit")){
+            if(!DidReturnSameResultForThisAPIKey(responseHeaders) && responseHeaders.ContainsKey("X-Ratelimit-Limit")){
                 try {
                     result = int.Parse(responseHeaders["X-Ratelimit-Limit"]);
                 }catch{}                
@@ -96,13 +96,17 @@ namespace UnsplashExplorerForUnity {
 
         private int GetLimitRemainingForThisHour(Dictionary<string, string> responseHeaders){
             int result = -1;
-            if(!responseHeaders.ContainsKey("Age") && responseHeaders.ContainsKey("X-Ratelimit-Remaining")){
+            if(!DidReturnSameResultForThisAPIKey(responseHeaders) && responseHeaders.ContainsKey("X-Ratelimit-Remaining")){
                 try {
                     result = int.Parse(responseHeaders["X-Ratelimit-Remaining"]);
                 }catch{}                
             }
 
             return result;
+        }
+
+        private bool DidReturnSameResultForThisAPIKey(Dictionary<string, string> responseHeaders){
+            return responseHeaders.ContainsKey("Age") && int.Parse(responseHeaders["Age"]) > 0;
         }
     }
 
