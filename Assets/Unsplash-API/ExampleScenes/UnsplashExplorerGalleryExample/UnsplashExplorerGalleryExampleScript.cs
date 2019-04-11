@@ -149,11 +149,15 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 
     private void ShowRandomPhoto(){
 
+        _preview.SetActive(true);
+
         UnsplashExplorer.Main.GetRandomPhoto(onlyFeatured:true).ContinueWith(t => {
             if(t.IsCanceled){
                 print("query canceled");
+                _preview.SetActive(false);
             }else if(t.IsFaulted){
                 Debug.LogError($"query failed: {t.Exception}");
+                _preview.SetActive(false);
             }else{                
                 ShowPreviewWith(t.Result);
             }            
