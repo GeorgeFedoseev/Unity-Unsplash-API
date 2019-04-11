@@ -44,6 +44,8 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
     void Start() {
         Application.targetFrameRate = 60;
 
+        _searchInput.keyboardType = TouchScreenKeyboardType.Search;
+
         ClearContainer(_searchResultsContainer);
         ShowPageLoadingIndicator(false);
 
