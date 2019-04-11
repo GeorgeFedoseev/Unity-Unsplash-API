@@ -26,7 +26,7 @@ public class SimpleRandomExampleScript : MonoBehaviour
     }
 
     void LoadPhoto(UnsplashPhoto photo){
-        new UnsplashDownloader().DownloadPhotoAsync(photo, null).ContinueWith(t => {
+        new UnsplashDownloader().DownloadPhotoAsync(photo, null, UnsplashPhotoSize.Regular).ContinueWith(t => {
             if(t.IsCanceled){
                 print("Photo download canceled");
             }else if(t.IsFaulted){

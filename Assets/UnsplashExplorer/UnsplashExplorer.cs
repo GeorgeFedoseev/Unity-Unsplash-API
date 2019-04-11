@@ -30,6 +30,9 @@ public class UnsplashExplorer : MonoBehaviour {
     private string _unsplashAccessKey = "";
     public string AccessKey {
         get {
+            if(string.IsNullOrWhiteSpace(_unsplashAccessKey)){
+                throw new UnauthorizedAccessException("Please set Unsplash Access Key in inspector.");
+            }
             return _unsplashAccessKey;
         }
     }
