@@ -12,10 +12,16 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 {   
     private float SCROLL_LOAD_THRESHOLD = 0.05f;
     private float SCROLL_LOAD_COOLDOWN_SEC = 1f;
+    private float SCROLL_LOAD_ERROR_COOLDOWN_SEC = 5f;
 
+    [SerializeField]
+    private Text _apiStatusText;
 
     [SerializeField]
     private InputField _searchInput;
+
+    [SerializeField]
+    private Button _clearInputButton;
 
     [SerializeField]
     private ScrollRect _scrollRect;
@@ -37,6 +43,7 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
     
     
     private float _lastTimeAppendedCells = -999f;
+    private float _lastTimeFailedToLoadPage = -999f;
 
     // PREVIEW
     [SerializeField]
@@ -47,6 +54,16 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 
     [SerializeField]
     private PhotoCellScript _previewPhotoCell;
+
+    // EMPTY
+    [SerializeField]
+    private GameObject _emptyMessageContainer;
+
+    [SerializeField]
+    private Text _emptyMessageText;
+
+    [SerializeField]
+    private Button _surpriseMeButton;
 
 
 
@@ -59,7 +76,9 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 
         ClearContainer(_searchResultsContainer);
         ShowPageLoadingIndicator(false);
-        ClosePreview();
+        ClosePreview();     
+        ShowEmptyMessageContainer(true, "TYPE SOMETHING\nor");  
+        _clearInputButton.gameObject.SetActive(false); 
 
         _searchInput.Select();
 
@@ -70,15 +89,33 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
            _debounceInputCoroutine = StartCoroutine(DebounceInputCoroutine());
        });        
 
+       _clearInputButton.onClick.AddListener(() => {
+           _searchInput.text = "";
+           _searchInput.Select();
+       });
+
        _previewOverlayButton.onClick.AddListener(ClosePreview);
+
+       _surpriseMeButton.onClick.AddListener(ShowRandomPhoto);
+
+       // limits tracking
+       UnsplashExplorer.Main.OnAPIRequestLimitsReport += (report) => {
+           if(report.Remaining == 0){
+               _apiStatusText.text = $"<color=red>Unsplash requests limit of {report.Total} calls for this hour exceeded</color>";
+           }else{
+               _apiStatusText.text = $"Unsplash API requests used for this hour: {report.Remaining}/{report.Total}";
+           }
+       };
        
     }
     
     void LateUpdate()
     {
         if(_scrollRect.verticalNormalizedPosition < SCROLL_LOAD_THRESHOLD){
-            if(!_isLoadingPage && _currentPage > 0 && _currentPage < _totalPages && Time.time - _lastTimeAppendedCells > SCROLL_LOAD_COOLDOWN_SEC){
-                print("wanna load");
+            if(!_isLoadingPage && _currentPage > 0 && _currentPage < _totalPages 
+                    && Time.time - _lastTimeAppendedCells > SCROLL_LOAD_COOLDOWN_SEC
+                    && Time.time - _lastTimeFailedToLoadPage > SCROLL_LOAD_ERROR_COOLDOWN_SEC
+            ){                    
                 LoadNextPage();
             }            
         }
@@ -93,10 +130,14 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 
     IEnumerator DebounceInputCoroutine(){
         if(string.IsNullOrWhiteSpace(_searchInput.text)){
+            ShowEmptyMessageContainer(true, "TYPE SOMETHING\nor");
             ClearContainer(_searchResultsContainer);
             _currentPage = -1;
+            _clearInputButton.gameObject.SetActive(false);
             yield break;
         }
+
+        _clearInputButton.gameObject.SetActive(true);
 
         yield return new WaitForSeconds(0.5f);        
 
@@ -106,18 +147,32 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
         _debounceInputCoroutine = null;
     }
 
+    private void ShowRandomPhoto(){
+
+        UnsplashExplorer.Main.GetRandomPhoto(onlyFeatured:true).ContinueWith(t => {
+            if(t.IsCanceled){
+                print("query canceled");
+            }else if(t.IsFaulted){
+                Debug.LogError($"query failed: {t.Exception}");
+            }else{                
+                ShowPreviewWith(t.Result);
+            }            
+        }, TaskScheduler.FromCurrentSynchronizationContext()).LogExceptions();
+    }
+
     private void LoadPhotosForQuery(string query, int page = 1){       
 
-        OnStartLoadingPage();
+        OnStartLoadingPage();        
 
         UnsplashExplorer.Main.SearchPhotos(query, page:page, perPage:30).ContinueWith(t => {
             if(t.IsCanceled){
                 print("search query canceled");
             }else if(t.IsFaulted){
                 Debug.LogError($"Search query failed: {t.Exception}");
+                _lastTimeFailedToLoadPage = Time.time;
             }else{
                 _totalPages = t.Result.total_pages;
-                AppendSearchResults(t.Result.results, page);
+                AppendSearchResults(t.Result.results, page);                
             }
 
             OnFinishedLoadingPage();
@@ -155,6 +210,12 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
     private void ClosePreview(){
         _preview.SetActive(false);
     }
+
+
+    private void ShowEmptyMessageContainer(bool show, string message = "NOTHING FOUND"){
+        _emptyMessageContainer.SetActive(show);
+        _emptyMessageText.text = message;
+    }
     
 
     // EVENTS
@@ -162,11 +223,17 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
     private void OnStartLoadingPage(){
         ShowPageLoadingIndicator(true);
         _isLoadingPage = true;
+
+        ShowEmptyMessageContainer(false);
     }
 
     private void OnFinishedLoadingPage(){
         ShowPageLoadingIndicator(false);
         _isLoadingPage = false;
+
+        if(_totalPages == 0){
+            ShowEmptyMessageContainer(true);
+        }
     }
 
 

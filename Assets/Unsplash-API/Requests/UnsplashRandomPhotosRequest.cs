@@ -8,6 +8,7 @@ namespace UnsplashExplorerForUnity {
 
     public class UnsplashRandomPhotosRequest : UnsplashRequest {
 
+        public UnsplashRandomPhotosRequest(UnsplashExplorer driver) : base(driver){}
 
         // https://unsplash.com/documentation#get-a-random-photo
         public Task<UnsplashPhoto> GetRandomPhotoAsync(bool only_featured, string query,
@@ -30,17 +31,11 @@ namespace UnsplashExplorerForUnity {
                 }else if(t.IsFaulted){
                     completionSource.SetException(t.Exception);
                 }else{
-
-                    var jsonResultString = t.Result;
-
-                    Debug.Log($"Received json string: {jsonResultString}");
+                    var jsonResultString = t.Result;                   
                     
                     // parse json
                     try {
                         var result = JsonUtility.FromJson<UnsplashPhoto>(jsonResultString);
-
-                        Debug.Log("parsed json string");                       
-                        
                         completionSource.SetResult(result);
                                                 
                     }catch(Exception ex){

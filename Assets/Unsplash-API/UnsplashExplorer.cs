@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -6,7 +7,12 @@ using UnityEngine;
 using UnsplashExplorerForUnity;
 using UnsplashExplorerForUnity.Model;
 
+
+
 public class UnsplashExplorer : MonoBehaviour {
+
+    public Action<UnsplashAPIRequestLimitsInfo> OnAPIRequestLimitsReport = (_) => {};
+
     private static UnsplashExplorer _instance;
     public static UnsplashExplorer Main {
         get {
@@ -45,7 +51,7 @@ public class UnsplashExplorer : MonoBehaviour {
     public Task<UnsplashMultiplePhotosRequestResult> SearchPhotos(string query, string collections = null, int page = 1, int perPage = 10,
                  UnsplashPhotoOrientation orientation = UnsplashPhotoOrientation.Any)
     {
-        var req = new UnsplashSearchRequest();
+        var req = new UnsplashSearchRequest(this);
         return req.GetSearchResultsAsync(query, collections, page, perPage, orientation);
     }
 
@@ -64,7 +70,7 @@ public class UnsplashExplorer : MonoBehaviour {
 
         var completionSource = new TaskCompletionSource<UnsplashPhoto>();
 
-        var req = new UnsplashRandomPhotosRequest();
+        var req = new UnsplashRandomPhotosRequest(this);
         req.GetRandomPhotoAsync(onlyFeatured, query, user, collections, orientation).ContinueWith(t => {            
             if(t.IsCanceled){
                 completionSource.SetCanceled();

@@ -7,6 +7,9 @@ namespace UnsplashExplorerForUnity {
 
     public class UnsplashSearchRequest : UnsplashRequest {
 
+        public UnsplashSearchRequest(UnsplashExplorer driver) : base(driver){}
+        
+
         // https://unsplash.com/documentation#search-photos
         public Task<UnsplashMultiplePhotosRequestResult> GetSearchResultsAsync(string query, string collections, int page, int per_page, UnsplashPhotoOrientation orientation){
             
@@ -23,16 +26,12 @@ namespace UnsplashExplorerForUnity {
                 }else if(t.IsFaulted){
                     completionSource.SetException(t.Exception);
                 }else{
-
+                    
                     var jsonResultString = t.Result;
-
-                    Debug.Log($"Received json string: {jsonResultString}");
                     
                     // parse json
                     try {
                         var result = JsonUtility.FromJson<UnsplashMultiplePhotosRequestResult>(jsonResultString);
-
-                        Debug.Log("parsed json string");
 
                         if(result.HasErrors){
                             var apiException = new UnsplashAPIException($"{result.errors.Count} error(-s): {string.Join("; ", result.errors)}");

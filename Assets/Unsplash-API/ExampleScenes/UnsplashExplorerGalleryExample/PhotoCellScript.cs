@@ -47,6 +47,7 @@ public class PhotoCellScript : MonoBehaviour
         _attributionText.text = $"Photo by {photo.user.name}";
         _attributionText.raycastTarget = _attributionIsClickable;
         if(_attributionIsClickable){
+            _attributionText.GetComponent<Button>().onClick.RemoveAllListeners();
             _attributionText.GetComponent<Button>().onClick.AddListener(() => {
                 Application.OpenURL(photo.user.links.html);
             });
