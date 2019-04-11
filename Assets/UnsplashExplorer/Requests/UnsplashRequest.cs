@@ -52,8 +52,8 @@ namespace UnsplashExplorerForUnity {
 
             var responseHeaders = www.GetResponseHeaders();
 
-            var responseHeadersStr = string.Join("; ", responseHeaders.Select(kv => $"{kv.Key} = {kv.Value}"));
-            Debug.Log($"responseHeadersStr: {responseHeadersStr}");
+            // var responseHeadersStr = string.Join("; ", responseHeaders.Select(kv => $"{kv.Key} = {kv.Value}"));
+            // Debug.Log($"responseHeadersStr: {responseHeadersStr}");
 
             
             int remainingLimit = -1;

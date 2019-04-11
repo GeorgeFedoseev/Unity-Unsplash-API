@@ -102,7 +102,7 @@ public class GalleryExampleScript : MonoBehaviour
            if(report.Remaining == 0){
                _apiStatusText.text = $"<color=red>Unsplash requests limit of {report.Total} calls for this hour exceeded</color>";
            }else{
-               _apiStatusText.text = $"Unsplash API requests used for this hour: {report.Remaining}/{report.Total}";
+               _apiStatusText.text = $"Unsplash API requests left for this hour: {report.Remaining}/{report.Total}";
            }
        };
        
