@@ -9,6 +9,10 @@ using UnsplashExplorerForUnity.Model;
 
 public class PhotoCellScript : MonoBehaviour
 {
+    public UnsplashPhotoSize _photoSize = UnsplashPhotoSize.Thumb;
+
+    public Button button;
+
     [SerializeField]
     private RawImage _rawImage;
 
@@ -17,7 +21,6 @@ public class PhotoCellScript : MonoBehaviour
 
     [SerializeField]
     private Text _attributionText;
-
 
     [SerializeField]
     private GameObject _loadingOverlay;
@@ -38,14 +41,17 @@ public class PhotoCellScript : MonoBehaviour
     public void InitWith(UnsplashPhoto photo){
         _photo = photo;
 
-        _attributionText.text = photo.user.name;
+        _attributionText.text = $"Photo by {photo.user.name}";
+        _attributionText.GetComponent<Button>().onClick.AddListener(() => {
+            Application.OpenURL(photo.user.links.html);
+        });
 
         ShowErrorLoading(false);
         ShowRawImage(false);
         ShowLoading(true);
 
         _downloader = new UnsplashDownloader();
-        _downloader.DownloadPhotoAsync(_photo, new Progress<float>(OnDownloadProgress), UnsplashPhotoSize.Thumb)
+        _downloader.DownloadPhotoAsync(_photo, new Progress<float>(OnDownloadProgress), _photoSize)
         .ContinueWith(t => {
             if(t.IsCanceled){
                 ShowErrorLoading(true, "Loading Canceled");

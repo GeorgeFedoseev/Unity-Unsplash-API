@@ -38,6 +38,17 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
     
     private float _lastTimeAppendedCells = -999f;
 
+    // PREVIEW
+    [SerializeField]
+    private GameObject _preview;
+
+    [SerializeField]
+    private Button _previewOverlayButton;
+
+    [SerializeField]
+    private PhotoCellScript _previewPhotoCell;
+
+
 
 
     // Start is called before the first frame update
@@ -48,6 +59,7 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 
         ClearContainer(_searchResultsContainer);
         ShowPageLoadingIndicator(false);
+        ClosePreview();
 
         _searchInput.Select();
 
@@ -57,6 +69,9 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
            }
            _debounceInputCoroutine = StartCoroutine(DebounceInputCoroutine());
        });        
+
+       _previewOverlayButton.onClick.AddListener(ClosePreview);
+       
     }
     
     void LateUpdate()
@@ -117,6 +132,11 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
         foreach(var photo in photos){
             var cell = InstantiateIntoContainer<PhotoCellScript>(_photoCellPrefab, _searchResultsContainer);
             cell.InitWith(photo);
+
+            var _photo = photo;
+            cell.button.onClick.AddListener(() => {
+                ShowPreviewWith(_photo);
+            });
         }
 
         _lastTimeAppendedCells = Time.time;
@@ -125,6 +145,15 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
     private void ShowPageLoadingIndicator(bool show){
         _pageLoadingIndicator.transform.SetAsLastSibling();
         _pageLoadingIndicator.SetActive(show);
+    }
+
+    private void ShowPreviewWith(UnsplashPhoto photo){
+        _preview.SetActive(true);
+        _previewPhotoCell.InitWith(photo);
+    }
+
+    private void ClosePreview(){
+        _preview.SetActive(false);
     }
     
 
