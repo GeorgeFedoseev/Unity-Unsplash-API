@@ -41,21 +41,20 @@ public class PhotoCellScript : MonoBehaviour
 
 
     public void InitWith(UnsplashPhoto photo){
+        Reset();
+
         _photo = photo;
 
         _attributionText.text = $"Photo by {photo.user.name}";
         _attributionText.raycastTarget = _attributionIsClickable;
-        if(_attributionIsClickable){
-            _attributionText.GetComponent<Button>().onClick.RemoveAllListeners();
+        if(_attributionIsClickable){            
             _attributionText.GetComponent<Button>().onClick.AddListener(() => {
                 Application.OpenURL(photo.user.links.html);
             });
         }
         
 
-        ShowErrorLoading(false);
-        ShowRawImage(false);
-        ShowLoading(true);
+        
 
         _downloader = new UnsplashDownloader();
         _downloader.DownloadPhotoAsync(_photo, new Progress<float>(OnDownloadProgress), _photoSize)
@@ -72,6 +71,15 @@ public class PhotoCellScript : MonoBehaviour
 
             ShowLoading(false);            
         }, TaskScheduler.FromCurrentSynchronizationContext()).LogExceptions();
+    }
+
+    public void Reset(){
+        SetTexture(null);
+        _loadingProgressIndicator.fillAmount = 0;
+        _attributionText.GetComponent<Button>().onClick.RemoveAllListeners();
+        ShowErrorLoading(false);
+        ShowRawImage(false);
+        ShowLoading(true);
     }
 
     private void ShowLoading(bool show){
@@ -93,7 +101,9 @@ public class PhotoCellScript : MonoBehaviour
             Destroy(_rawImage.texture);
         }
         _rawImage.texture = tex;
-        _aspectRatioFitter.aspectRatio = (float)tex.width/tex.height;
+        if(tex != null){
+            _aspectRatioFitter.aspectRatio = (float)tex.width/tex.height;
+        }        
     }
 
     // EVENTS

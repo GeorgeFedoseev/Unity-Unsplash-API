@@ -211,6 +211,7 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
     }
 
     private void ClosePreview(){
+        _previewPhotoCell.Reset();        
         _preview.SetActive(false);
     }
 
