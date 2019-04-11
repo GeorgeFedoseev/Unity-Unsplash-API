@@ -2,7 +2,7 @@
 
 using System;
 
-namespace UnsplashExplorerForUnity.Model {
+namespace UnsplashExplorerForUnity {
 
     [Serializable]
     public class UnsplashPhotoUrls {

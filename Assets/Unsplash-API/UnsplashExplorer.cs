@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 using UnsplashExplorerForUnity;
-using UnsplashExplorerForUnity.Model;
 
 
 

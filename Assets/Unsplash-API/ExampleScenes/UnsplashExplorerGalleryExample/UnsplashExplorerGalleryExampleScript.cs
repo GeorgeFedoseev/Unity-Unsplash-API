@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnsplashExplorerForUnity;
-using UnsplashExplorerForUnity.Model;
 
 public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 {   

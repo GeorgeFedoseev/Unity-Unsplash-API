@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnsplashExplorerForUnity.Model;
 
 namespace UnsplashExplorerForUnity {
 

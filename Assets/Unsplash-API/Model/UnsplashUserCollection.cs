@@ -1,6 +1,6 @@
 
 
-namespace UnsplashExplorerForUnity.Model {
+namespace UnsplashExplorerForUnity {
 
     public class UnsplashUserCollection {
         public long id;

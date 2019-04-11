@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace UnsplashExplorerForUnity.Model {
+namespace UnsplashExplorerForUnity {
 
     [Serializable]
     public class UnsplashMultiplePhotosRequestResult : UnsplashRequestResult {

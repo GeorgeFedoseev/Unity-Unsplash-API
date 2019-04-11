@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnsplashExplorerForUnity.Model {
+namespace UnsplashExplorerForUnity {
 
     [Serializable]
     public class UnsplashPhoto {
