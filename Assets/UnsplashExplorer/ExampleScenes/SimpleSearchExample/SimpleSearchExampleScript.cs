@@ -23,7 +23,8 @@ public class SimpleSearchExampleScript : MonoBehaviour
                 }else{
                     DisplayResults(t.Result.results);
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext()).LogExceptions();
+            }, TaskScheduler.FromCurrentSynchronizationContext()) // to run on main thread
+            .LogExceptions(); // log any exceptions in last task to Unity console
         
     }
 
@@ -43,7 +44,8 @@ public class SimpleSearchExampleScript : MonoBehaviour
                         cell.GetComponentInChildren<RawImage>().texture = tex;
                         cell.GetComponentInChildren<AspectRatioFitter>().aspectRatio = (float)tex.width/tex.height;
                     }
-                }).LogExceptions();
+                }, TaskScheduler.FromCurrentSynchronizationContext()) // to run on main thread
+                .LogExceptions(); // log any exceptions in last task to Unity console
         }
     }
 

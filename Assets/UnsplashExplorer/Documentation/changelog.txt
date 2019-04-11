@@ -1,0 +1,7 @@
+CHANGELOG
+=========
+
+ver 1.0
+-------
+- search photos
+- get random photo

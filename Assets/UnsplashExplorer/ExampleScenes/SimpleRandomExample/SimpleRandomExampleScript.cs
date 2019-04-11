@@ -22,7 +22,8 @@ public class SimpleRandomExampleScript : MonoBehaviour
                 }else{
                     LoadPhoto(t.Result);
                 }
-            }, TaskScheduler.FromCurrentSynchronizationContext()).LogExceptions();
+            }, TaskScheduler.FromCurrentSynchronizationContext()) // to run on main thread
+            .LogExceptions(); // log any exceptions in last task to Unity console
     }
 
     void LoadPhoto(UnsplashPhoto photo){
@@ -36,7 +37,8 @@ public class SimpleRandomExampleScript : MonoBehaviour
                 rawImage.texture = tex;
                 rawImage.GetComponent<AspectRatioFitter>().aspectRatio = (float)tex.width/tex.height;
             }
-        }, TaskScheduler.FromCurrentSynchronizationContext()).LogExceptions();
+        }, TaskScheduler.FromCurrentSynchronizationContext()) // to run on main thread
+        .LogExceptions(); // log any exceptions in last task to Unity console
     }
 
    
