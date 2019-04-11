@@ -15,6 +15,9 @@ public class PhotoCellScript : MonoBehaviour
     [SerializeField]
     private AspectRatioFitter _aspectRatioFitter;
 
+    [SerializeField]
+    private Text _attributionText;
+
 
     [SerializeField]
     private GameObject _loadingOverlay;
@@ -34,6 +37,8 @@ public class PhotoCellScript : MonoBehaviour
 
     public void InitWith(UnsplashPhoto photo){
         _photo = photo;
+
+        _attributionText.text = photo.user.name;
 
         ShowErrorLoading(false);
         ShowRawImage(false);
