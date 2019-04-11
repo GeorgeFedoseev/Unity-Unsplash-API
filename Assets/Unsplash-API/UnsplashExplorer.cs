@@ -42,24 +42,11 @@ public class UnsplashExplorer : MonoBehaviour {
     /// <param name="perPage">Number of items per page. Default: 10, Min: 1, Max: 30</param>
     /// <param name="orientation">Filter search results by photo orientation.</param>
     /// <returns></returns>
-    public Task<List<UnsplashPhoto>> SearchPhotos(string query, string collections = null, int page = 1, int perPage = 10,
+    public Task<UnsplashMultiplePhotosRequestResult> SearchPhotos(string query, string collections = null, int page = 1, int perPage = 10,
                  UnsplashPhotoOrientation orientation = UnsplashPhotoOrientation.Any)
     {
-
-        var completionSource = new TaskCompletionSource<List<UnsplashPhoto>>();
-
         var req = new UnsplashSearchRequest();
-        req.GetSearchResultsAsync(query, collections, page, perPage, orientation).ContinueWith(t => {            
-            if(t.IsCanceled){
-                completionSource.SetCanceled();
-            }else if(t.IsFaulted){
-                completionSource.SetException(t.Exception);
-            }else{
-                completionSource.SetResult(t.Result.results);
-            }
-        }, TaskScheduler.FromCurrentSynchronizationContext());
-
-        return completionSource.Task;
+        return req.GetSearchResultsAsync(query, collections, page, perPage, orientation);
     }
 
     /// <summary>

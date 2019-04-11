@@ -10,9 +10,15 @@ using UnsplashExplorerForUnity.Model;
 
 public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 {   
+    private float SCROLL_LOAD_THRESHOLD = 0.05f;
+    private float SCROLL_LOAD_COOLDOWN_SEC = 1f;
+
 
     [SerializeField]
     private InputField _searchInput;
+
+    [SerializeField]
+    private ScrollRect _scrollRect;
 
     [SerializeField]
     private Transform _searchResultsContainer;
@@ -20,54 +26,84 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
     [SerializeField]
     private GameObject _photoCellPrefab;
 
-    private Coroutine _debounceCoroutine;
+    [SerializeField]
+    private GameObject _pageLoadingIndicator;
+
+    private Coroutine _debounceInputCoroutine;
+
+    private int _currentPage = -1;
+    private long _totalPages = -1;
+    private bool _isLoadingPage = false;
+    
+    
+    private float _lastTimeAppendedCells = -999f;
+
+
 
     // Start is called before the first frame update
     void Start() {
         Application.targetFrameRate = 60;
 
-
         ClearContainer(_searchResultsContainer);
+        ShowPageLoadingIndicator(false);
 
         _searchInput.Select();
 
        _searchInput.onValueChanged.AddListener((val) => {
-           if(_debounceCoroutine != null){
-               StopCoroutine(_debounceCoroutine);
+           if(_debounceInputCoroutine != null){
+               StopCoroutine(_debounceInputCoroutine);
            }
-           _debounceCoroutine = StartCoroutine(DebounceCoroutine());
-       });
-        
+           _debounceInputCoroutine = StartCoroutine(DebounceInputCoroutine());
+       });        
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    void LateUpdate()
     {
-        
+        if(_scrollRect.verticalNormalizedPosition < SCROLL_LOAD_THRESHOLD){
+            if(!_isLoadingPage && _currentPage > 0 && _currentPage < _totalPages && Time.time - _lastTimeAppendedCells > SCROLL_LOAD_COOLDOWN_SEC){
+                print("wanna load");
+                LoadNextPage();
+            }            
+        }
     }
 
     // METHODS
-    IEnumerator DebounceCoroutine(){
-        yield return new WaitForSeconds(0.5f);
-        LoadPhotosForQuery(_searchInput.text);
 
-        _debounceCoroutine = null;
+    private void LoadNextPage(){
+       _currentPage += 1;
+        LoadPhotosForQuery(_searchInput.text, _currentPage);
     }
 
-    private void LoadPhotosForQuery(string query, int page = 1){
-        if(string.IsNullOrWhiteSpace(query)){
+    IEnumerator DebounceInputCoroutine(){
+        if(string.IsNullOrWhiteSpace(_searchInput.text)){
             ClearContainer(_searchResultsContainer);
-            return;
+            _currentPage = -1;
+            yield break;
         }
 
-        UnsplashExplorer.Main.SearchPhotos(query).ContinueWith(t => {
+        yield return new WaitForSeconds(0.5f);        
+
+        _currentPage = 0;
+        LoadNextPage();
+
+        _debounceInputCoroutine = null;
+    }
+
+    private void LoadPhotosForQuery(string query, int page = 1){       
+
+        OnStartLoadingPage();
+
+        UnsplashExplorer.Main.SearchPhotos(query, page:page, perPage:30).ContinueWith(t => {
             if(t.IsCanceled){
                 print("search query canceled");
             }else if(t.IsFaulted){
                 Debug.LogError($"Search query failed: {t.Exception}");
             }else{
-                AppendSearchResults(t.Result, page);
+                _totalPages = t.Result.total_pages;
+                AppendSearchResults(t.Result.results, page);
             }
+
+            OnFinishedLoadingPage();
         }, TaskScheduler.FromCurrentSynchronizationContext()).LogExceptions();
     }
 
@@ -80,14 +116,37 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
             var cell = InstantiateIntoContainer<PhotoCellScript>(_photoCellPrefab, _searchResultsContainer);
             cell.InitWith(photo);
         }
+
+        _lastTimeAppendedCells = Time.time;
+    }
+
+    private void ShowPageLoadingIndicator(bool show){
+        _pageLoadingIndicator.transform.SetAsLastSibling();
+        _pageLoadingIndicator.SetActive(show);
+    }
+    
+
+    // EVENTS
+
+    private void OnStartLoadingPage(){
+        ShowPageLoadingIndicator(true);
+        _isLoadingPage = true;
+    }
+
+    private void OnFinishedLoadingPage(){
+        ShowPageLoadingIndicator(false);
+        _isLoadingPage = false;
     }
 
 
 
-
-    // STATIC
-    public static void ClearContainer(Transform container){
+    // UTILS
+    public void ClearContainer(Transform container){
         foreach(Transform t in container){
+            if(t.gameObject == _pageLoadingIndicator){
+                continue;
+            }
+
             if(Application.isPlaying){
                 GameObject.Destroy(t.gameObject);
             }else{
