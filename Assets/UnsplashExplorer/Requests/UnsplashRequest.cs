@@ -1,5 +1,6 @@
 
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,10 @@ namespace UnsplashExplorerForUnity {
         }
 
         public Task<string> GetResponseStringAsync(string url){
+            if(_requestCoroutine != null){
+                throw new InvalidOperationException("Request is already in progress");
+            }
+
             _taskCompletionSource = new TaskCompletionSource<string>();                  
             _requestCoroutine = _driver.StartCoroutine(RequestCoroutine(url));
 

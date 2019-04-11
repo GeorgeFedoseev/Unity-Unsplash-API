@@ -20,8 +20,7 @@ public class UnsplashExplorer : MonoBehaviour {
                 if(found == null){
                     throw new UnsplashExplorerScriptNotFoundException("Please add UnsplashExplorer script to your scene.");                    
                 }
-                
-                return found;
+                _instance = found;               
             }
             return _instance;
         }
@@ -29,7 +28,6 @@ public class UnsplashExplorer : MonoBehaviour {
 
     [SerializeField]
     private string _unsplashAccessKey = "";
-
     public string AccessKey {
         get {
             return _unsplashAccessKey;
@@ -47,7 +45,7 @@ public class UnsplashExplorer : MonoBehaviour {
     /// <param name="perPage">Number of items per page. Default: 10, Min: 1, Max: 30</param>
     /// <param name="orientation">Filter search results by photo orientation.</param>
     /// <returns></returns>
-    public Task<UnsplashMultiplePhotosRequestResult> SearchPhotos(string query, string collections = null, int page = 1, int perPage = 10,
+    public Task<UnsplashMultiplePhotosRequestResult> SearchPhotosAsync(string query, string collections = null, int page = 1, int perPage = 10,
                  UnsplashPhotoOrientation orientation = UnsplashPhotoOrientation.Any)
     {
         var req = new UnsplashSearchRequest(this);
@@ -63,7 +61,7 @@ public class UnsplashExplorer : MonoBehaviour {
     /// <param name="user">Limit selection to a single user.</param>
     /// <param name="orientation">Filter search results by photo orientation.</param>
     /// <returns></returns>
-    public Task<UnsplashPhoto> GetRandomPhoto(bool onlyFeatured = false, string query = null, 
+    public Task<UnsplashPhoto> GetRandomPhotoAsync(bool onlyFeatured = false, string query = null, 
                  string collections = null, string user = null, UnsplashPhotoOrientation orientation = UnsplashPhotoOrientation.Any)
     {
 
@@ -81,10 +79,5 @@ public class UnsplashExplorer : MonoBehaviour {
         }, TaskScheduler.FromCurrentSynchronizationContext());
 
         return completionSource.Task;
-    }
-
-   
-
-    
-    
+    }    
 }

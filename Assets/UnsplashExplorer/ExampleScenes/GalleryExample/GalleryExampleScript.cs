@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnsplashExplorerForUnity;
 
-public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
+public class GalleryExampleScript : MonoBehaviour
 {   
     private float SCROLL_LOAD_THRESHOLD = 0.05f;
     private float SCROLL_LOAD_COOLDOWN_SEC = 1f;
@@ -150,7 +150,7 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 
         _preview.SetActive(true);
 
-        UnsplashExplorer.Main.GetRandomPhoto(onlyFeatured:true).ContinueWith(t => {
+        UnsplashExplorer.Main.GetRandomPhotoAsync(onlyFeatured:true).ContinueWith(t => {
             if(t.IsCanceled){
                 print("query canceled");
                 _preview.SetActive(false);
@@ -167,7 +167,7 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 
         OnStartLoadingPage();        
 
-        UnsplashExplorer.Main.SearchPhotos(query, page:page, perPage:30).ContinueWith(t => {
+        UnsplashExplorer.Main.SearchPhotosAsync(query, page:page, perPage:30).ContinueWith(t => {
             if(t.IsCanceled){
                 print("search query canceled");
             }else if(t.IsFaulted){
@@ -243,7 +243,7 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
 
 
     // UTILS
-    public void ClearContainer(Transform container){
+    private void ClearContainer(Transform container){
         foreach(Transform t in container){
             if(t.gameObject == _pageLoadingIndicator){
                 continue;
@@ -258,7 +258,7 @@ public class UnsplashExplorerGalleryExampleScript : MonoBehaviour
         }
     }   
 
-    public static T InstantiateIntoContainer<T>(UnityEngine.Object prefab, Transform container) where T: MonoBehaviour {
+    private static T InstantiateIntoContainer<T>(UnityEngine.Object prefab, Transform container) where T: MonoBehaviour {
         var a = (GameObject.Instantiate(prefab) as GameObject).GetComponent<T>();
         a.transform.SetParent(container);
         a.transform.localScale = Vector3.one;
