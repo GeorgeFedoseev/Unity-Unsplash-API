@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Unsplash-API/Example.unity
+    path: Assets/Unsplash-API/ExampleScenes/UnsplashExplorerGalleryExample/UnsplashExplorerGalleryExample.unity
     guid: c7646d6d10d4f4e36895467472b21355
   m_configObjects: {}
