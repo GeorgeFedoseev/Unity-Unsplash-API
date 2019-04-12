@@ -16,6 +16,8 @@ public class GalleryExampleScript : MonoBehaviour
     [SerializeField]
     private Text _apiStatusText;
 
+
+    // SEARCH
     [SerializeField]
     private InputField _searchInput;
 
@@ -30,6 +32,8 @@ public class GalleryExampleScript : MonoBehaviour
     
     [SerializeField]
     private GameObject _photoCellPrefab;
+    
+    // PAGINATION
 
     [SerializeField]
     private GameObject _pageLoadingIndicator;
@@ -54,7 +58,7 @@ public class GalleryExampleScript : MonoBehaviour
     [SerializeField]
     private PhotoCellScript _previewPhotoCell;
 
-    // EMPTY
+    // EMPTY RESULTS
     [SerializeField]
     private GameObject _emptyMessageContainer;
 
@@ -81,12 +85,15 @@ public class GalleryExampleScript : MonoBehaviour
 
         _searchInput.Select();
 
-       _searchInput.onValueChanged.AddListener((val) => {
+
+        // subscribe to events
+
+        _searchInput.onValueChanged.AddListener((val) => {
            if(_debounceInputCoroutine != null){
                StopCoroutine(_debounceInputCoroutine);
            }
            _debounceInputCoroutine = StartCoroutine(DebounceInputCoroutine());
-       });        
+        });        
 
        _clearInputButton.onClick.AddListener(() => {
            _searchInput.text = "";
@@ -245,6 +252,7 @@ public class GalleryExampleScript : MonoBehaviour
     // UTILS
     private void ClearContainer(Transform container){
         foreach(Transform t in container){
+            // dont remove loading indicator
             if(t.gameObject == _pageLoadingIndicator){
                 continue;
             }
