@@ -1,0 +1,18 @@
+Title
+-----
+Unsplash Explorer - search and download photos from Unsplash
+
+Description
+-----------
+Simple interface to searching Unsplash and getting random photos.<br>
+Includes methods for asynchronous image downloading.
+<br><br>
+This asset uses System.Threading.Tasks namespace (.NET 4.x).<br>
+Built using Unsplash API.<br>
+Check <a href="https://georgefedoseev.com/unsplash-explorer">Documentation</a>.
+<br><br>
+See official API <a href="https://unsplash.com/documentation#getting-started">docs</a> and <a href="https://unsplash.com/documentation#rate-limiting">API limits</a>.
+
+Keywords
+--------
+Unsplash, api, stock, photos, images
