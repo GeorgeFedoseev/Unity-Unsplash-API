@@ -1,7 +1,11 @@
 CHANGELOG
 =========
 
-ver 1.0
+v1.0
 -------
 - search photos
 - get random photo
+
+v1.1
+-----
+- PhotoCellScript: fixed bug when texture was loading after PhotoCell was destroyed causing errors
