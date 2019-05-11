@@ -59,6 +59,16 @@ public class PhotoCellScript : MonoBehaviour
         _downloader = new UnsplashDownloader();
         _downloader.DownloadPhotoAsync(_photo, new Progress<float>(OnDownloadProgress), _photoSize)
         .ContinueWith(t => {
+
+            // if object was destroyed
+            if(this == null){
+                if(t.IsCompleted && !t.IsCanceled){
+                    // destroy texture
+                    Destroy(t.Result);
+                }
+                return;
+            }
+
             if(t.IsCanceled){
                 ShowErrorLoading(true, "Loading Canceled");
             }else if(t.IsFaulted){
@@ -74,6 +84,10 @@ public class PhotoCellScript : MonoBehaviour
     }
 
     public void Reset(){
+        if(_downloader != null){
+            _downloader.CancelDownload();
+        }
+        
         SetTexture(null);
         _loadingProgressIndicator.fillAmount = 0;
         _attributionText.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -108,10 +122,16 @@ public class PhotoCellScript : MonoBehaviour
 
     // EVENTS
     private void OnDownloadProgress(float progress){
-        _loadingProgressIndicator.fillAmount = progress;
+        if(_loadingProgressIndicator != null){
+            _loadingProgressIndicator.fillAmount = progress;
+        }        
     }
 
     private void OnDestroy(){
+        if(_downloader != null){
+            _downloader.CancelDownload();
+        }
+
         if(_rawImage.texture != null){
             Destroy(_rawImage.texture);
         }
