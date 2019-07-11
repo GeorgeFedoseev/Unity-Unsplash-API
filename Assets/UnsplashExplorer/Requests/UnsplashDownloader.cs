@@ -9,7 +9,7 @@ namespace UnsplashExplorerForUnity {
     public class UnsplashDownloader {
 
         private UnsplashPhoto _photo;
-        private MonoBehaviour _coroutineRunner;
+        private UnsplashExplorer _driver;
 
         private TaskCompletionSource<Texture2D> _taskCompletionSource;
 
@@ -18,11 +18,11 @@ namespace UnsplashExplorerForUnity {
         private Coroutine _downloadCoroutine;
 
         public UnsplashDownloader(){            
-            _coroutineRunner = UnsplashExplorer.Main;            
+            _driver = UnsplashExplorer.Main;            
         }
 
         public Task<Texture2D> DownloadPhotoAsync(UnsplashPhoto photo, IProgress<float> progressReporter, 
-                                                    UnsplashPhotoSize size = UnsplashPhotoSize.Regular){
+                                                    UnsplashPhotoSize size = UnsplashPhotoSize.Regular, bool incrementPhotoDownloadsCount = false){
 
             if(_downloadCoroutine != null){
                 throw new InvalidOperationException("Download is already in progress");
@@ -34,14 +34,20 @@ namespace UnsplashExplorerForUnity {
             _taskCompletionSource = new TaskCompletionSource<Texture2D>();
 
             var url = _photo.urls.GetUrlForSize(size);
-            _downloadCoroutine = _coroutineRunner.StartCoroutine(DownloadCoroutine(url));
+            _downloadCoroutine = _driver.StartCoroutine(DownloadCoroutine(url));
+
+            // log donwload to Unsplash analytics to make author happy
+            if(incrementPhotoDownloadsCount){                
+                SendIncrementDownloadsCountRequest(_photo);
+            }
+            
 
             return _taskCompletionSource.Task;
         }
 
         public void CancelDownload(){
             if(_downloadCoroutine != null){
-                _coroutineRunner.StopCoroutine(_downloadCoroutine);
+                _driver.StopCoroutine(_downloadCoroutine);
                 _downloadCoroutine = null;
                 _taskCompletionSource.SetCanceled();
             }
@@ -71,6 +77,11 @@ namespace UnsplashExplorerForUnity {
             }
 
             _downloadCoroutine = null;
+        }
+
+        private async void SendIncrementDownloadsCountRequest(UnsplashPhoto photo){
+            var request = new UnsplashRequest(_driver);
+            await request.GetResponseStringAsync(photo.links.download_location);            
         }
     }
 

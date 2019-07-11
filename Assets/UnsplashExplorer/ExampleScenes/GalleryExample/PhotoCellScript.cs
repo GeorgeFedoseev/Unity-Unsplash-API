@@ -37,10 +37,11 @@ public class PhotoCellScript : MonoBehaviour
     private UnsplashDownloader _downloader;
     private UnsplashPhoto _photo;
     
+    private bool _increasesPhotoDownloadsCount;
 
 
 
-    public void InitWith(UnsplashPhoto photo){
+    public void InitWith(UnsplashPhoto photo, bool incrementPhotoDownloadsCount = false){
         Reset();
 
         _photo = photo;
@@ -57,7 +58,7 @@ public class PhotoCellScript : MonoBehaviour
         
 
         _downloader = new UnsplashDownloader();
-        _downloader.DownloadPhotoAsync(_photo, new Progress<float>(OnDownloadProgress), _photoSize)
+        _downloader.DownloadPhotoAsync(_photo, new Progress<float>(OnDownloadProgress), _photoSize, incrementPhotoDownloadsCount)
         .ContinueWith(t => {
 
             // if object was destroyed

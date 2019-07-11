@@ -214,7 +214,7 @@ public class GalleryExampleScript : MonoBehaviour
 
     private void ShowPreviewWith(UnsplashPhoto photo){
         _preview.SetActive(true);
-        _previewPhotoCell.InitWith(photo);
+        _previewPhotoCell.InitWith(photo, incrementPhotoDownloadsCount: true);
     }
 
     private void ClosePreview(){
